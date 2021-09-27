@@ -1,0 +1,11 @@
+.list {
+  width: 80%;
+  padding: 2rem;
+  max-width: 60rem;
+  margin: 1rem auto;
+}
+
+.noContent {
+  text-align: center;
+  font-size: 15px;
+}

@@ -1,0 +1,42 @@
+.parent {
+  display: flex;
+  justify-content: center;
+  animation: moveDown 3s;
+}
+
+@keyframes moveDown {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(20px);
+  }
+}
+
+.alert {
+  position: fixed;
+  height: 50px;
+  width: 50%;
+  z-index: 1;
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px 0 10px 0;
+}
+.successAlert {
+  background: rgb(187, 240, 189);
+}
+
+.errorAlert {
+  background: rgb(224, 154, 154);
+}
+
+.successAlert p {
+  color: green;
+}
+.errorAlert p {
+  color: red;
+}
+
+.icon {
+  margin-right: 10px;
+}

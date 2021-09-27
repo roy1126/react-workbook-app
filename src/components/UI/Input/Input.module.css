@@ -1,0 +1,24 @@
+.input label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.input input {
+  font: inherit;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 0.5px solid gray;
+  width: 15rem;
+  max-width: 100%;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input p {
+  color: red;
+}

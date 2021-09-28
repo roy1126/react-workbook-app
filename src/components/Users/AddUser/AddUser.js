@@ -8,8 +8,8 @@ import Input from "../../UI/Input/Input";
 import { Fragment, useContext, useEffect, useState } from "react";
 import UsersContext from "../../../store/users-context";
 import { User } from "../../model/user.model";
-import AlertSuccessful from "../../UI/Alert/AlertSuccessful";
 import Axios from "axios";
+import AlertContext from "../../../store/alert-context";
 const contents = {
   inputs: [
     {
@@ -58,6 +58,7 @@ const schema = yup.object().shape({
 
 const AddUser = (props) => {
   const usersCtx = useContext(UsersContext);
+  const alertCtx = useContext(AlertContext);
   const instance = Axios.create({
     baseURL: "https://react-workbook-app-5017d-default-rtdb.firebaseio.com/",
     headers: { "Content-type": "application/json" },
@@ -68,18 +69,15 @@ const AddUser = (props) => {
     handleSubmit,
     setValue,
     reset,
-    formState: { isSubmitSuccessful, errors },
+    formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
   const fetchData = async () => {
-    console.log("fetchinggg");
     if (usersCtx.users.length === 0) {
       const response = await instance.get("users.json");
-      console.log("getting response", response);
       const usersData = response.data;
-      console.log("usersDAtasaaa", usersData);
 
       if (usersData?.length === 0 || usersData === null) {
         usersCtx.setUsers([]);
@@ -100,12 +98,10 @@ const AddUser = (props) => {
         );
         newUsersData.push(user);
       }
-      console.log("NEW USERS DATA", newUsersData);
       usersCtx.setUsers(newUsersData);
     }
   };
   useEffect(() => {
-    console.log("useEffect running");
     fetchData();
   });
 
@@ -124,7 +120,11 @@ const AddUser = (props) => {
         .put(`users/${usersCtx.updatingKey}.json`, { data: user })
         .then(() => {
           usersCtx.updateUser(user);
-          setAlertMessage("User EDITED Successfully!");
+          alertCtx.setAlertMessage("User EDITED Successfully!");
+          setTimeout(() => {
+            alertCtx.setIsSuccess(false);
+          }, 3000);
+          alertCtx.setIsSuccess(true);
         });
     } else {
       instance
@@ -133,37 +133,30 @@ const AddUser = (props) => {
         })
         .then(() => {
           usersCtx.addUser(user);
-          setAlertMessage("User ADDED Successfully!");
+          alertCtx.setAlertMessage("User ADDED Successfully!");
+          setTimeout(() => {
+            alertCtx.setIsSuccess(false);
+          }, 3000);
+          alertCtx.setIsSuccess(true);
         });
     }
 
     e.target.reset();
     onResetForm();
+    alertCtx.resetAll();
   };
 
   const onResetForm = () => {
     reset("", { keepErrors: false });
     setIsEditing(false);
+    usersCtx.startUpdate(null);
   };
-
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      setTimeout(() => {
-        setIsFormSubmitted(false);
-      }, 3000);
-      setIsFormSubmitted(true);
-    }
-  }, [isSubmitSuccessful]);
 
   useEffect(() => {
     if (usersCtx.updatingUser) {
-      // console.log(usersCtx);
       setIsEditing(true);
       const user = usersCtx.updatingUser;
-      console.log("this is user", user.firstName);
-      setValue("firstName", user.firstName);
+      setValue("firstName", user.firstName, { shouldValidate: true });
       setValue("lastName", user.lastName, { shouldValidate: true });
       setValue("email", user.email, { shouldValidate: true });
       setValue("eid", user.eid, { shouldValidate: true });
@@ -184,16 +177,9 @@ const AddUser = (props) => {
   }, [usersCtx.updatingUser, setValue]);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
 
   return (
     <Fragment>
-      {isFormSubmitted && (
-        <AlertSuccessful
-          isFormSubmitted={isFormSubmitted}
-          message={alertMessage}
-        />
-      )}
       <Card className={classes.input}>
         <form onSubmit={handleSubmit(onSubmitForm)}>
           <div className={classes.inputGroups}>

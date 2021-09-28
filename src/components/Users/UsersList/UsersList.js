@@ -1,16 +1,17 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Table } from "react-bootstrap";
 import UsersContext from "../../../store/users-context";
 import Card from "../../UI/Card/Card";
 import classes from "./UsersList.module.css";
 import Button from "../../UI/Button/Button";
 import Axios from "axios";
-import AlertSuccessful from "../../UI/Alert/AlertSuccessful";
-
+// import Alert from "../../UI/Alert/Alert";
+import AlertContext from "../../../store/alert-context";
 const UsersList = (props) => {
   const usersCtx = useContext(UsersContext);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [isDeletedSuccess, setIsDeletedSuccess] = useState(false);
+  const alertCtx = useContext(AlertContext);
+  // const [alertMessage, setAlertMessage] = useState("");
+  // const [isDeletedSuccess, setIsDeletedSuccess] = useState(false);
   const instance = Axios.create({
     baseURL:
       "https://react-workbook-app-5017d-default-rtdb.firebaseio.com/users/",
@@ -18,11 +19,16 @@ const UsersList = (props) => {
   const deleteUser = (key) => {
     instance.delete(`/${key}.json`).then(() => {
       usersCtx.removeUser(key);
-      setAlertMessage("User DELETED Successfully");
+      alertCtx.setAlertMessage("User DELETED Successfully!");
       setTimeout(() => {
-        setIsDeletedSuccess(false);
+        alertCtx.setIsSuccess(false);
       }, 3000);
-      setIsDeletedSuccess(true);
+      alertCtx.setIsSuccess(true);
+      // setAlertMessage("User DELETED Successfully");
+      // setTimeout(() => {
+      //   setIsDeletedSuccess(false);
+      // }, 3000);
+      // setIsDeletedSuccess(true);
     });
   };
   const startUpdating = (key) => {
@@ -31,7 +37,7 @@ const UsersList = (props) => {
 
   return (
     <Card className={classes.list}>
-      {isDeletedSuccess && <AlertSuccessful message={alertMessage} />}
+      {/* {isDeletedSuccess && <AlertSuccessful message={alertMessage} />} */}
       {usersCtx.users.length !== 0 && (
         <div>
           <Table hover responsive>
@@ -48,7 +54,7 @@ const UsersList = (props) => {
             <tbody>
               {usersCtx.users.map((user) => {
                 return (
-                  <tr key={user.eid}>
+                  <tr key={user.key}>
                     <td>{user.firstName}</td>
                     <td>{user.lastName}</td>
                     <td>{user.email}</td>
@@ -76,7 +82,9 @@ const UsersList = (props) => {
         </div>
       )}
       {usersCtx.users.length === 0 && (
-        <div className={classes.noContent}>No content</div>
+        <div className={classes.noContent}>
+          <h3>No content</h3>
+        </div>
       )}
     </Card>
   );

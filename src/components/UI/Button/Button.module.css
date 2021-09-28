@@ -23,3 +23,11 @@
 .button:focus {
   outline: none;
 }
+
+.update {
+  background-color: rgb(199, 168, 28);
+}
+
+.delete {
+  background-color: rgb(245, 57, 57);
+}

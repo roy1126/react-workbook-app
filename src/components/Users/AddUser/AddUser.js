@@ -106,8 +106,10 @@ const AddUser = (props) => {
   });
 
   const onSubmitForm = (data, e) => {
+    const key = isEditing ? usersCtx.updatingKey : null;
+
     const user = new User(
-      null,
+      key,
       data.firstName,
       data.lastName,
       data.email,
@@ -115,41 +117,58 @@ const AddUser = (props) => {
       new Date(data.birthdate)
     );
 
+    console.log(user);
+
     if (isEditing) {
       instance
-        .put(`users/${usersCtx.updatingKey}.json`, { data: user })
-        .then(() => {
+        .put(`users/${key}.json`, { data: user })
+        .then((res) => {
+          user.key = res.data.name;
           usersCtx.updateUser(user);
           alertCtx.setAlertMessage("User EDITED Successfully!");
           setTimeout(() => {
             alertCtx.setIsSuccess(false);
           }, 3000);
           alertCtx.setIsSuccess(true);
+        })
+        .catch((error) => {
+          alertCtx.setAlertMessage(error);
+          setTimeout(() => {
+            alertCtx.setIsError(false);
+          }, 3000);
+          alertCtx.setIsError(true);
         });
     } else {
       instance
         .post("users.json", {
           data: user,
         })
-        .then(() => {
+        .then((res) => {
+          user.key = res.data.name;
           usersCtx.addUser(user);
           alertCtx.setAlertMessage("User ADDED Successfully!");
           setTimeout(() => {
             alertCtx.setIsSuccess(false);
           }, 3000);
           alertCtx.setIsSuccess(true);
+        })
+        .catch((error) => {
+          alertCtx.setAlertMessage(error);
+          setTimeout(() => {
+            alertCtx.setIsError(false);
+          }, 3000);
+          alertCtx.setIsError(true);
         });
     }
 
     e.target.reset();
     onResetForm();
-    alertCtx.resetAll();
   };
 
   const onResetForm = () => {
     reset("", { keepErrors: false });
     setIsEditing(false);
-    usersCtx.startUpdate(null);
+    // usersCtx.startUpdate(null);
   };
 
   useEffect(() => {

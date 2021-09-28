@@ -36,14 +36,10 @@ const usersReducer = (state, action) => {
     const editingIndex = state.users.findIndex(
       (user) => user.key === state.updatingKey
     );
-    const oldUser = state.users[editingIndex];
-    const updatedUser = {
-      ...oldUser,
-      ...action.user,
-    };
+
     const updatedUsers = [...state.users];
-    updatedUsers[editingIndex] = updatedUser;
-    console.log("UPDATED USERS:", updatedUsers);
+    updatedUsers[editingIndex] = action.user;
+    updatedUsers[editingIndex].key = state.users[editingIndex].key;
 
     return {
       updatingKey: null,

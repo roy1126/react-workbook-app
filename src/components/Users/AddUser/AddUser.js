@@ -10,6 +10,7 @@ import UsersContext from "../../../store/users-context";
 import { User } from "../../model/user.model";
 import Axios from "axios";
 import AlertContext from "../../../store/alert-context";
+
 const contents = {
   inputs: [
     {
@@ -74,36 +75,7 @@ const AddUser = (props) => {
     resolver: yupResolver(schema),
   });
 
-  const fetchData = async () => {
-    if (usersCtx.users.length === 0) {
-      const response = await instance.get("users.json");
-      const usersData = response.data;
-
-      if (usersData?.length === 0 || usersData === null) {
-        usersCtx.setUsers([]);
-        return;
-      }
-
-      const newUsersData = [];
-
-      for (const key in usersData) {
-        const val = usersData[key].data;
-        const user = new User(
-          key,
-          val.firstName,
-          val.lastName,
-          val.email,
-          val.eid,
-          new Date(val.birthdate)
-        );
-        newUsersData.push(user);
-      }
-      usersCtx.setUsers(newUsersData);
-    }
-  };
-  useEffect(() => {
-    fetchData();
-  });
+  
 
   const onSubmitForm = (data, e) => {
     const key = isEditing ? usersCtx.updatingKey : null;
